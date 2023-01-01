@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-
 import javax.swing.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -28,9 +27,6 @@ public class CalenderController {
     private LocalDate currentDate;
 
 
-    private final int WIDTH = 7;
-    private final int HEIGHT = 6;
-
     public void initialize() {
         meetings = new HashMap<LocalDate, String>();
         buildComboBoxes();
@@ -49,7 +45,7 @@ public class CalenderController {
 
 
     private void buildComboBoxes() {
-        final int START_YEAR = 1948, END_YEAR = LocalDate.now().getYear();
+        final int END_YEAR = LocalDate.now().getYear(), START_YEAR = END_YEAR - 100;
 
         for (Month month : Month.values()) {
             monthBox.getItems().add(month.getDisplayName(TextStyle.FULL, Locale.getDefault()));
@@ -62,6 +58,8 @@ public class CalenderController {
     }
 
     private void initGrid(LocalDate newDate) {
+        final int WIDTH = 7, HEIGHT = 6;
+
         if (newDate == null)
             currentDate = LocalDate.now(); //init with current date grid
         else {
@@ -104,7 +102,7 @@ public class CalenderController {
 
     private void dayPressed(MouseEvent mouseEvent, LocalDate currentDate, Button btn) {
         String msg;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String[] options = new String[4];
         options[0] = "Add new Meeting";
         options[1] = "Edit Meetings";
