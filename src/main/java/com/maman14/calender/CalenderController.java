@@ -1,5 +1,6 @@
 package com.maman14.calender;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.scene.layout.GridPane;
 
 import javax.swing.*;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.Locale;
@@ -16,7 +18,7 @@ import java.util.Locale;
 public class CalenderController {
 
     @FXML
-    private GridPane daysGrade;
+    private GridPane daysGrid;
 
     @FXML
     private ComboBox<String> monthBox, yearBox;
@@ -24,23 +26,30 @@ public class CalenderController {
     private HashMap<LocalDate, String> meetings;
     private Button[][] buttons;
     private LocalDate currentDate;
-    private LocalDate currentYear;
 
 
     private final int WIDTH = 7;
     private final int HEIGHT = 6;
 
     public void initialize() {
+        meetings = new HashMap<LocalDate, String>();
         buildComboBoxes();
-        initGrid();
+        initGrid(null);
+    }
+    @FXML
+    private void setDatePressed(ActionEvent event) {
+        String monthName = monthBox.getValue();
+        int month = monthBox.getItems().indexOf(monthName)+1;
+        int year = Integer.parseInt(yearBox.getValue());
+//        System.out.println();
+        currentDate = LocalDate.of(year,month, 1);
+        initGrid(currentDate);
     }
 
 
 
-
     private void buildComboBoxes() {
-        final int DAYS = 31, MONTHS = 12, START_YEAR = 1948, END_YEAR = LocalDate.now().getYear();
-        meetings = new HashMap<LocalDate, String>();
+        final int START_YEAR = 1948, END_YEAR = LocalDate.now().getYear();
 
         for (Month month : Month.values()) {
             monthBox.getItems().add(month.getDisplayName(TextStyle.FULL, Locale.getDefault()));
@@ -52,43 +61,106 @@ public class CalenderController {
         }
     }
 
-    private void initGrid() {
-        buttons = new Button[HEIGHT][WIDTH];
-        currentDate = LocalDate.now(); //init with current date grid
+    private void initGrid(LocalDate newDate) {
+        if (newDate == null)
+            currentDate = LocalDate.now(); //init with current date grid
+        else {
+            daysGrid.getChildren().clear();
+            currentDate = newDate; //init with current date grid
+        }
         int firstDay = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), 1).getDayOfWeek().getValue();
         int daysInMonth = YearMonth.of(currentDate.getYear(), currentDate.getMonth()).lengthOfMonth();
-        int currentDay = 1;
 
-        for (int row = 0; row < HEIGHT; row++) {
-            for (int column = 0; column < WIDTH; column++) {
-                if ((row == 0 && column < firstDay) || currentDay > daysInMonth) {
+        int currentDayNum = 1;
+        buttons = new Button[HEIGHT][WIDTH];
+
+        for (int row = 0; row < HEIGHT; row++) {for (int column = 0; column < WIDTH; column++) {
+                if ((row == 0 && column < firstDay) || currentDayNum > daysInMonth) {
                     buttons[row][column] = new Button("");
                     buttons[row][column].setDisable(true);
-                    buttons[row][column].setPrefSize(daysGrade.getPrefWidth() / WIDTH, daysGrade.getPrefWidth() / WIDTH);
+                    buttons[row][column].setStyle("-fx-base: rgb(196,193,193);");
+                    buttons[row][column].setPrefSize(daysGrid.getPrefWidth() / WIDTH, daysGrid.getPrefWidth() / WIDTH);
                 } else {
-                    buttons[row][column] = new Button(currentDay+"");
-                    buttons[row][column].setPrefSize(daysGrade.getPrefWidth() / WIDTH, daysGrade.getPrefWidth() / WIDTH);
-                    int finalRow = row, finalColumn = column;
+                    buttons[row][column] = new Button(currentDayNum+"");
+                    buttons[row][column].setPrefSize(daysGrid.getPrefWidth() / WIDTH, daysGrid.getPrefWidth() / WIDTH);
+                    int finalCurrentDayNum = currentDayNum, finalRow = row,finalColumn = column;
                     buttons[row][column].setOnMousePressed(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent mouseEvent) {
-                            dayPressed(mouseEvent, finalRow, finalColumn, currentDate);
+                            currentDate = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), finalCurrentDayNum);
+                            dayPressed(mouseEvent, currentDate, buttons[finalRow][finalColumn]);
+//                            if (buttonColor)
+//                                buttons[finalRow][finalColumn].setStyle("-fx-base: rgba(0,166,255,0.45);");
                         }
                     }) ;
-                    currentDay++;
+                    currentDayNum++;
+                    currentDate = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), finalCurrentDayNum);
+                    if (meetings.containsKey(currentDate))
+                        buttons[finalRow][finalColumn].setStyle("-fx-base: rgba(0,166,255,0.45);");
+
                 }
-                daysGrade.add(buttons[row][column], column, row);
+                daysGrid.add(buttons[row][column], column, row);
             }
         }
     }
 
-    private void dayPressed(MouseEvent mouseEvent, int row, int column, LocalDate currentDate) {
+    private void dayPressed(MouseEvent mouseEvent, LocalDate currentDate, Button btn) {
+        String meetingInfo;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+        String msg;
 
-//        LocalDate selectedDate = (LocalDate) buttons[finalRow][finalColumn].get();
-        String meeting = JOptionPane.showInputDialog(null, "Set meeting details: ", "Set an Appointment", JOptionPane.INFORMATION_MESSAGE);
-        if (meeting != null)
-//            if meetings.containsKey(currentDate)
-            meetings.put(currentDate, meeting);
+        String[] options = new String[4];
+        options[0] = "Add new Meeting";
+        options[1] = "Edit Meetings";
+        options[2] = "Remove all";
+        options[3] = "Exit";
+
+
+
+
+        if (meetings.containsKey(currentDate))
+            msg = currentDate.format(formatter) + " Meetings:\n" + meetings.get(currentDate);
+        else
+            msg = "No meetings for this day.";
+
+        JOptionPane.showMessageDialog(null, msg, currentDate.format(formatter) + " Meetings", JOptionPane.INFORMATION_MESSAGE);
+        int answer = JOptionPane.showOptionDialog(null, "What would you like to do?", currentDate.format(formatter) + " Meetings",0, JOptionPane.QUESTION_MESSAGE,null, options,null);
+
+        if (answer == 0) {
+            meetingInfo = JOptionPane.showInputDialog(null, "Set meeting details: ", "Set an Appointment", JOptionPane.INFORMATION_MESSAGE);
+            if (meetingInfo != null && !meetingInfo.equals("")) {
+                if (meetings.putIfAbsent(currentDate, "- " + meetingInfo) != null) {
+                    meetingInfo = meetings.get(currentDate) + "\n- " + meetingInfo;
+                    meetings.put(currentDate, meetingInfo);
+                }
+                else
+                    btn.setStyle("-fx-base: rgba(0,166,255,0.45);");
+                JOptionPane.showMessageDialog(null, "New meeting added.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+        else if (answer == 1) {
+            if (meetings.containsKey(currentDate)) {
+                meetingInfo = JOptionPane.showInputDialog(null, "Insert your changes here.\nPlease notice all old meeting will be removed.", "Edit " + currentDate.format(formatter), JOptionPane.INFORMATION_MESSAGE);
+                if (meetingInfo != null) {
+                    meetings.put(currentDate, "- " +meetingInfo);
+                    JOptionPane.showMessageDialog(null, "Meeting edited.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+            else
+                JOptionPane.showMessageDialog(null, "No meetings to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        }
+
+        else if (answer == 2) {
+            if (meetings.containsKey(currentDate)) {
+                JOptionPane.showMessageDialog(null, "All meeting were removed for \n" + currentDate.format(formatter), "So Empty..", JOptionPane.INFORMATION_MESSAGE);
+                meetings.remove(currentDate);
+                btn.setStyle("-fx-base:#c4c1c1;");
+            }
+            else
+                JOptionPane.showMessageDialog(null, "No meetings to remove.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        }
     }
 
 
