@@ -12,7 +12,7 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="451.0" prefWidth="600.0" style="-fx-background-color: rgba(239,228,192,0.8);" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.maman14.calender.CalenderController">
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d0dfed" height="48.0" layoutX="14.0" layoutY="147.0" stroke="BLACK" strokeType="INSIDE" width="568.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#edd9a6" height="48.0" layoutX="14.0" layoutY="147.0" stroke="BLACK" strokeType="INSIDE" width="568.0" />
       <HBox alignment="TOP_CENTER" layoutX="94.0" layoutY="97.0" prefHeight="32.0" prefWidth="331.0">
          <children>
             <ComboBox fx:id="monthBox" prefWidth="150.0" />
@@ -32,15 +32,36 @@
       <GridPane fx:id="daysGrid" layoutX="16.0" layoutY="197.0" prefHeight="240.0" prefWidth="568.0">
       </GridPane>
       <Button layoutX="425.0" layoutY="97.0" mnemonicParsing="false" onAction="#setDatePressed" text="Set Date" />
-      <HBox layoutX="35.0" layoutY="159.0" prefHeight="38.0" prefWidth="547.0" spacing="35.0">
+      <HBox layoutX="33.0" layoutY="159.0" prefHeight="38.0" prefWidth="549.0" spacing="22.0">
          <children>
-            <Label text="Sunday" />
-            <Label text="Monday" />
-            <Label text="Tuesday" />
-            <Label text="Wednessday" />
-            <Label text="Thursday" />
-            <Label text="Friday" />
-            <Label text="Saturday" />
+            <Label prefHeight="19.0" prefWidth="49.0" text="Sunday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="55.0" text="Monday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="55.0" text="Tuesday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="81.0" text="Wednessday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="63.0" text="Thursday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="45.0" text="Friday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
+            <Label prefHeight="19.0" prefWidth="62.0" text="Saturday">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
          </children>
          <padding>
             <Insets top="1.0" />

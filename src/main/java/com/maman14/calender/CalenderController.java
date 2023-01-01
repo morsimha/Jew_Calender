@@ -96,7 +96,7 @@ public class CalenderController {
                     currentDayNum++;
                     currentDate = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), finalCurrentDayNum);
                     if (meetings.containsKey(currentDate))
-                        buttons[finalRow][finalColumn].setStyle("-fx-base: rgba(0,166,255,0.45);");
+                        buttons[finalRow][finalColumn].setStyle("-fx-base: rgba(241,170,134,0.8);");
 
                 }
                 daysGrid.add(buttons[row][column], column, row);
@@ -115,9 +115,6 @@ public class CalenderController {
         options[2] = "Remove all";
         options[3] = "Exit";
 
-
-
-
         if (meetings.containsKey(currentDate))
             msg = currentDate.format(formatter) + " Meetings:\n" + meetings.get(currentDate);
         else
@@ -129,12 +126,13 @@ public class CalenderController {
         if (answer == 0) {
             meetingInfo = JOptionPane.showInputDialog(null, "Set meeting details: ", "Set an Appointment", JOptionPane.INFORMATION_MESSAGE);
             if (meetingInfo != null && !meetingInfo.equals("")) {
-                if (meetings.putIfAbsent(currentDate, "- " + meetingInfo) != null) {
-                    meetingInfo = meetings.get(currentDate) + "\n- " + meetingInfo;
+                meetingInfo = "- " + meetingInfo;
+                if (meetings.putIfAbsent(currentDate, meetingInfo) != null) {
+                    meetingInfo = meetings.get(currentDate) + "\n" + meetingInfo;
                     meetings.put(currentDate, meetingInfo);
                 }
                 else
-                    btn.setStyle("-fx-base: rgba(0,166,255,0.45);");
+                    btn.setStyle("-fx-base: rgba(241,170,134,0.8);");
                 JOptionPane.showMessageDialog(null, "New meeting added.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -155,7 +153,7 @@ public class CalenderController {
             if (meetings.containsKey(currentDate)) {
                 JOptionPane.showMessageDialog(null, "All meeting were removed for \n" + currentDate.format(formatter), "So Empty..", JOptionPane.INFORMATION_MESSAGE);
                 meetings.remove(currentDate);
-                btn.setStyle("-fx-base:#c4c1c1;");
+                btn.setStyle("-fx-base:#eae9e9;");
             }
             else
                 JOptionPane.showMessageDialog(null, "No meetings to remove.", "Error", JOptionPane.ERROR_MESSAGE);
