@@ -89,8 +89,6 @@ public class CalenderController {
                         public void handle(MouseEvent mouseEvent) {
                             currentDate = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), finalCurrentDayNum);
                             dayPressed(mouseEvent, currentDate, buttons[finalRow][finalColumn]);
-//                            if (buttonColor)
-//                                buttons[finalRow][finalColumn].setStyle("-fx-base: rgba(0,166,255,0.45);");
                         }
                     }) ;
                     currentDayNum++;
@@ -105,10 +103,8 @@ public class CalenderController {
     }
 
     private void dayPressed(MouseEvent mouseEvent, LocalDate currentDate, Button btn) {
-        String meetingInfo;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
         String msg;
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
         String[] options = new String[4];
         options[0] = "Add new Meeting";
         options[1] = "Edit Meetings";
@@ -121,45 +117,51 @@ public class CalenderController {
             msg = "No meetings for this day.";
 
         JOptionPane.showMessageDialog(null, msg, currentDate.format(formatter) + " Meetings", JOptionPane.INFORMATION_MESSAGE);
-        int answer = JOptionPane.showOptionDialog(null, "What would you like to do?", currentDate.format(formatter) + " Meetings",0, JOptionPane.QUESTION_MESSAGE,null, options,null);
+        int answer = JOptionPane.showOptionDialog(null, "What would you like to do?", currentDate.format(formatter) + " Meetings", 0, JOptionPane.QUESTION_MESSAGE, null, options, null);
 
-        if (answer == 0) {
-            meetingInfo = JOptionPane.showInputDialog(null, "Set meeting details: ", "Set an Appointment", JOptionPane.INFORMATION_MESSAGE);
-            if (meetingInfo != null && !meetingInfo.equals("")) {
-                meetingInfo = "- " + meetingInfo;
-                if (meetings.putIfAbsent(currentDate, meetingInfo) != null) {
-                    meetingInfo = meetings.get(currentDate) + "\n" + meetingInfo;
-                    meetings.put(currentDate, meetingInfo);
-                }
-                else
-                    btn.setStyle("-fx-base: rgba(241,170,134,0.8);");
-                JOptionPane.showMessageDialog(null, "New meeting added.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
-            }
+        if (answer == 0)
+            addNewMeeting(formatter, btn);
+        else if (answer == 1)
+            editMeeting(formatter);
+        else if (answer == 2)
+            removeAllMeetings(formatter, btn);
+    }
+
+    private void addNewMeeting(DateTimeFormatter formatter,Button btn) {
+        String meetingInfo = JOptionPane.showInputDialog(null, "Set meeting details: ", "Set an Appointment", JOptionPane.INFORMATION_MESSAGE);
+        if (meetingInfo != null && !meetingInfo.equals("")) {
+            meetingInfo = "- " + meetingInfo;
+            if (meetings.putIfAbsent(currentDate, meetingInfo) != null) {
+                meetingInfo = meetings.get(currentDate) + "\n" + meetingInfo;
+                meetings.put(currentDate, meetingInfo);
+            } else
+                btn.setStyle("-fx-base: rgba(241,170,134,0.8);");
+            JOptionPane.showMessageDialog(null, "New meeting added.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
         }
-        else if (answer == 1) {
+    }
+
+        private void editMeeting(DateTimeFormatter formatter) {
+        String meetingInfo;
             if (meetings.containsKey(currentDate)) {
                 meetingInfo = JOptionPane.showInputDialog(null, "Insert your changes here.\nPlease notice all old meeting will be removed.", "Edit " + currentDate.format(formatter), JOptionPane.INFORMATION_MESSAGE);
                 if (meetingInfo != null) {
                     meetings.put(currentDate, "- " +meetingInfo);
-                    JOptionPane.showMessageDialog(null, "Meeting edited.\n" + currentDate.format(formatter) + " Meetings:\n" + meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Meeting edited.\n" + currentDate.format(formatter) + " Meetings:\n" + "- " +meetingInfo, "Hooray", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
             else
                 JOptionPane.showMessageDialog(null, "No meetings to edit.", "Error", JOptionPane.ERROR_MESSAGE);
-
         }
 
-        else if (answer == 2) {
-            if (meetings.containsKey(currentDate)) {
-                JOptionPane.showMessageDialog(null, "All meeting were removed for \n" + currentDate.format(formatter), "So Empty..", JOptionPane.INFORMATION_MESSAGE);
-                meetings.remove(currentDate);
-                btn.setStyle("-fx-base:#eae9e9;");
-            }
-            else
-                JOptionPane.showMessageDialog(null, "No meetings to remove.", "Error", JOptionPane.ERROR_MESSAGE);
+    private void removeAllMeetings(DateTimeFormatter formatter, Button btn) {
 
+        if (meetings.containsKey(currentDate)) {
+            JOptionPane.showMessageDialog(null, "All meeting were removed for \n" + currentDate.format(formatter), "So Empty..", JOptionPane.INFORMATION_MESSAGE);
+            meetings.remove(currentDate);
+            btn.setStyle("-fx-base:#eae9e9;");
         }
+        else
+            JOptionPane.showMessageDialog(null, "No meetings to remove.", "Error", JOptionPane.ERROR_MESSAGE);
+
     }
-
-
-}
+    }
